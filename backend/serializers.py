@@ -12,17 +12,27 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ManagerSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
-    user_phone = serializers.CharField(source='user.phone', read_only=True)
-    department_name = serializers.CharField(source='department.name', read_only=True)
-    joined_on = serializers.DateField(source='user.joined_on', read_only=True)
+    # Include user info
+    first_name = serializers.CharField(write_only=True)
+    last_name = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)
     
     class Meta:
         model = Manager
-        fields = ['id', 'user', 'user_name', 'user_email', 'user_phone', 'department', 
-                 'department_name', 'team', 'status', 'joined_on']
+        fields = ['id', 'user', 'department', 'team', 'status', 'first_name', 'last_name', 'email']
 
+    def create(self, validated_data):
+        first_name = validated_data.pop('first_name')
+        last_name = validated_data.pop('last_name')
+        email = validated_data.pop('email')
+
+        # Create user
+        user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email)
+        
+        # Create manager profile
+        manager = Manager.objects.create(user=user, **validated_data)
+        return manager
+    
 class StaffSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     user_email = serializers.CharField(source='user.email', read_only=True)
