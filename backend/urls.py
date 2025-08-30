@@ -6,8 +6,8 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'departments', DepartmentViewSet)
 router.register(r'managers', ManagerViewSet)
-router.register(r'staff', StaffViewSet)
-router.register(r'customers', CustomerViewSet)
+router.register(r'staff', StaffViewSet)  # This matches your frontend API.get("staff/")
+router.register(r'customers', CustomerViewSet)  # This matches your frontend API.get("customers/")
 
 urlpatterns = [
     path('', include(router.urls)),
